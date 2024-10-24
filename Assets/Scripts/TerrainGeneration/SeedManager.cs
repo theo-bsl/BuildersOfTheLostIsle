@@ -1,3 +1,4 @@
+using Tools.Singleton;
 using UnityEngine;
 
 public class SeedManager : Singleton<SeedManager>
