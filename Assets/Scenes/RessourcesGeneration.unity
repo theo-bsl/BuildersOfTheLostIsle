@@ -122,6 +122,66 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &120373855
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 120373857}
+  - component: {fileID: 120373856}
+  m_Layer: 0
+  m_Name: RessourcesGenerator (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &120373856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120373855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11c0d3d336fd87e47ae3976dea118c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _refresh: 0
+  _groundLayer: 6
+  _distanceBetweenResources: 15
+  _rejectionSamples: 1000
+  _distanceBetweenTrees: 5
+  _forestSize: {x: 5, y: 5}
+  _nbMaxResources: 100
+  _pourcentTrees: 15
+  _pourcentRocks: 10
+  _pourcentBushes: 25
+  _treesPrefabs:
+  - {fileID: 187032348208596776, guid: 462c662493157f84f91fb510afe7e3f9, type: 3}
+  _rocksPrefabs:
+  - {fileID: 8790229164343028421, guid: de396ac0001f764498c8766df73527ab, type: 3}
+  _bushesPrefabs:
+  - {fileID: 7184072026020109649, guid: 0402553d54f47a147bdc7e87113fa2b6, type: 3}
+--- !u!4 &120373857
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 120373855}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &516746219
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,6 +439,135 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1728907621
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1728907623}
+  - component: {fileID: 1728907622}
+  m_Layer: 0
+  m_Name: TerrainGenerator (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1728907622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728907621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 119a0bfadaf712e48a6a08bbd8bb946b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _needDontDestroyOnLoad: 0
+  _islandify: 1
+  _shapeIsland: 1
+  _makeLayer: 0
+  _makeWater: 1
+  _seed: 0
+  _worldSize: 10
+  _shapePower: 3
+  _shapeDistance: 100
+  _groundElevation: 2
+  _gridDensity: 40
+  _gridNbLayer: 2
+  _meshSize: 30
+  _heightMultiplier: 2
+  _frequency: 0.03
+  _octaveCount: 1
+  _persistence: 0
+  _lacunarity: 0
+  _waterLevel: 0
+  _refresh: 0
+  _alwaysRefresh: 0
+  _dirtLandPrefab: {fileID: 3444024263026781256, guid: 3aba31de132229046a65f4b0418b4e12,
+    type: 3}
+  _waterLandPrefab: {fileID: 6988452201483263177, guid: f52cbcae7a63ff64c9941042c25017ff,
+    type: 3}
+--- !u!4 &1728907623
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728907621}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1866356566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1866356568}
+  - component: {fileID: 1866356567}
+  m_Layer: 0
+  m_Name: RessourcesGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1866356567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866356566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11c0d3d336fd87e47ae3976dea118c30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _refresh: 0
+  _groundLayer: 0
+  _distanceBetweenResources: 20
+  _rejectionSamples: 30
+  _distanceBetweenTrees: 5
+  _forestSize: {x: 5, y: 5}
+  _nbMaxResources: 100
+  _pourcentTrees: 15
+  _pourcentRocks: 10
+  _pourcentBushes: 25
+  _treesPrefabs:
+  - {fileID: 187032348208596776, guid: 462c662493157f84f91fb510afe7e3f9, type: 3}
+  _rocksPrefabs:
+  - {fileID: 8790229164343028421, guid: de396ac0001f764498c8766df73527ab, type: 3}
+  _bushesPrefabs:
+  - {fileID: 7184072026020109649, guid: 0402553d54f47a147bdc7e87113fa2b6, type: 3}
+--- !u!4 &1866356568
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866356566}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2024031745
 GameObject:
   m_ObjectHideFlags: 0
@@ -395,7 +584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2024031747
 Transform:
   m_ObjectHideFlags: 0
@@ -423,6 +612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 119a0bfadaf712e48a6a08bbd8bb946b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _needDontDestroyOnLoad: 0
   _islandify: 1
   _shapeIsland: 1
   _makeLayer: 0
@@ -454,4 +644,7 @@ SceneRoots:
   - {fileID: 963194228}
   - {fileID: 705507995}
   - {fileID: 2024031747}
+  - {fileID: 1728907623}
   - {fileID: 516746221}
+  - {fileID: 1866356568}
+  - {fileID: 120373857}

@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerrainGenerator : MonoBehaviour
+public class TerrainGenerator : Singleton<TerrainGenerator> 
 {
     [Header("World Options")]
     [SerializeField] private bool _islandify   = default;
@@ -14,7 +13,7 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField]               private long  _seed            = default;
     [SerializeField, Range(2, 10)] private int   _worldSize       = default;
     [SerializeField, Range(0, 5)]  private float _shapePower      = default;
-    [SerializeField]               private float _shapeDistance   = default;
+    [SerializeField]               private int   _shapeDistance   = default;
     [SerializeField]               private float _groundElevation = default;
     
     [Header("")][Header("Mesh Settings")]
@@ -46,21 +45,19 @@ public class TerrainGenerator : MonoBehaviour
     private readonly List<DirtLand> _dirtLands  = new List<DirtLand>();
     private readonly List<WaterLand> _waterLands = new List<WaterLand>();
 
-    private void Awake()
+    private new void Awake()
     {
+        base.Awake();
+        
         _transform = transform;
     }
 
-    private void Start()
+    public void Init()
     {
-        _dirtLandsHolder = new GameObject("DirtLands");
-        _dirtLandsHolder.transform.SetParent(_transform);
-        
-        _waterLandsHolder = new GameObject("WaterLands");
-        _waterLandsHolder.transform.SetParent(_transform);
+        InitHolder();
+        InitSeed();
         
         GenerateTerrain();
-        
         CompleteTerrainGeneration();
     }
 
@@ -73,8 +70,22 @@ public class TerrainGenerator : MonoBehaviour
         ClearWaterLands();
 
         GenerateTerrain();
-        
         CompleteTerrainGeneration();
+    }
+    
+    private void InitHolder()
+    {
+        _dirtLandsHolder = new GameObject("DirtLands");
+        _dirtLandsHolder.transform.SetParent(_transform);
+        
+        _waterLandsHolder = new GameObject("WaterLands");
+        _waterLandsHolder.transform.SetParent(_transform);
+    }
+
+    private void InitSeed()
+    {
+        //_seed = DateTime.Now.Ticks;
+        _seed = PlayerPrefs.GetInt("seed", 0);
     }
     
     private GameObject InstantiateLand(GameObject landPrefab, Transform parent, Vector3 position, string chunkName)
@@ -86,18 +97,10 @@ public class TerrainGenerator : MonoBehaviour
         return land;
     }
 
-    private void InitSeed()
-    {
-        //_seed = DateTime.Now.Ticks;
-        _seed = PlayerPrefs.GetInt("seed", 0);
-    }
-
     private void GenerateTerrain()
     {
         ClearDirtLands();
         ClearWaterLands();
-        
-        InitSeed();
 
         Vector3 chunkPosition = Vector3.zero;
         Vector3 perlinOffset = Vector3.zero;
@@ -156,4 +159,7 @@ public class TerrainGenerator : MonoBehaviour
         }
         _waterLands.Clear();
     }
+    
+    public int GroundSize => _worldSize * _meshSize - _shapeDistance;
+    public int WorldSize => _worldSize * _meshSize;
 }
