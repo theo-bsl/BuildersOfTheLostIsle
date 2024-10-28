@@ -15,13 +15,13 @@ namespace GameManager
 
         private void InitGame()
         {
-            _terrainGenerator.Init();
+            _terrainGenerator?.Init();
             Invoke(nameof(InitResources), 0.1f);
         }
         
         private void InitResources()
         {
-            _resourcesGenerator.Init();
+            _resourcesGenerator?.Init();
         }
     }
 }

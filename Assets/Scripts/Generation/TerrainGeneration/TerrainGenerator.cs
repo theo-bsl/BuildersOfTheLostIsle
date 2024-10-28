@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Calcul;
 using UnityEngine;
 
 public class TerrainGenerator : Singleton<TerrainGenerator> 
@@ -103,13 +104,18 @@ public class TerrainGenerator : Singleton<TerrainGenerator>
         ClearWaterLands();
 
         Vector3 chunkPosition = Vector3.zero;
+        Vector2 chunkPivotPosition = Vector2.zero;
+        Vector2 chunkOppositePivotPosition = Vector2.zero;
         Vector3 perlinOffset = Vector3.zero;
+        Vector2 worldCenter = new Vector2(_worldSize * _meshSize / 2, _worldSize * _meshSize / 2);
 
         for (int x = 0; x < _worldSize; x++)
         {
             for (int z = 0; z < _worldSize; z++)
             {
                 chunkPosition.Set(x * _meshSize, 0, z * _meshSize);
+                chunkPivotPosition.Set(x * _meshSize, z * _meshSize);
+                chunkOppositePivotPosition.Set(x * _meshSize + _meshSize, z * _meshSize + _meshSize);
                 perlinOffset.Set(x * (_gridDensity - 1), 0, z * (_gridDensity - 1));
 
                 DirtLand dirtLand = InstantiateLand(_dirtLandPrefab, _dirtLandsHolder.transform, chunkPosition, $"DirtLand{x}{z}").GetComponent<DirtLand>();
@@ -122,7 +128,10 @@ public class TerrainGenerator : Singleton<TerrainGenerator>
 
                 _dirtLands.Add(dirtLand);
                 
-                bool makeWater = _makeWater && (x == 0 || z == 0 || x == _worldSize - 1 || z == _worldSize - 1);
+                float distanceToPivot = Calculate.Distance(chunkPivotPosition, worldCenter, _shapePower);
+                float distanceToOpposite = Calculate.Distance(chunkOppositePivotPosition, worldCenter, _shapePower);
+                
+                bool makeWater = _makeWater && (distanceToPivot > _shapeDistance || distanceToOpposite > _shapeDistance);
 
                 if (!makeWater) continue;
                 WaterLand waterLand = InstantiateLand(_waterLandPrefab, _waterLandsHolder.transform, chunkPosition, $"WaterLand{x}{z}").GetComponent<WaterLand>();
