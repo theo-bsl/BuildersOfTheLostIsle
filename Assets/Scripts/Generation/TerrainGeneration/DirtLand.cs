@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Calcul;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
@@ -29,33 +30,14 @@ public class DirtLand : MonoBehaviour
                    private float   _lacunarity     = default;
                    private Vector3 _perlinOffset = Vector3.zero;
     
-    private float Remap(float value, float oldMin, float oldMax, float newMin, float newMax)
-    {
-        // Calcul du facteur de conversion
-        float scale = (newMax - newMin) / (oldMax - oldMin);
-        
-        // Conversion de la valeur dans le nouvel intervalle
-        float newValue = newMin + (value - oldMin) * scale;
-        
-        // Clamp la valeur dans les bornes du nouvel intervalle
-        return Mathf.Max(newMin, Mathf.Min(newMax, newValue));
-    }
-
-    private float ShapeIsland(Vector2 vertexPosition, Vector2 worldCenter, float power)
-    {
-        //Minkowski distance
-        return Mathf.Pow(
-               Mathf.Pow(Mathf.Abs(vertexPosition.x - worldCenter.x), power) + 
-               Mathf.Pow(Mathf.Abs(vertexPosition.y - worldCenter.y), power), 1f / power);
-    }
-    
     private float Islandify(Vector2 vertexPosition, float elevation, float worldSize, int meshSize, bool shapeIsland = false, float shapeDistance = 0f, float shapePower = 0f)
     {
         Vector2 worldCenter = Vector2.one * (worldSize * meshSize / 2);
 
-        float dist = shapeIsland ? ShapeIsland(vertexPosition, worldCenter, shapePower) : Vector2.Distance(vertexPosition, worldCenter);
+        //float dist = shapeIsland ? ShapeIsland(vertexPosition, worldCenter, shapePower) : Vector2.Distance(vertexPosition, worldCenter);
+        float dist = shapeIsland ? Calculate.Distance(vertexPosition, worldCenter, shapePower) : Vector2.Distance(vertexPosition, worldCenter);
         
-        dist = -Remap(dist, shapeDistance, worldSize * meshSize / 2, 0, 1) + 1;
+        dist = -Calculate.Remap(dist, shapeDistance, worldSize * meshSize / 2, 0, 1) + 1;
 
         return -Mathf.Cos(Mathf.PI * dist) * elevation;
     }
@@ -65,23 +47,6 @@ public class DirtLand : MonoBehaviour
         height *= nbLayer;
         int heightInt = (int)height;
         return (float)heightInt / nbLayer;
-    }
-
-    private float PerlinNoise(float x, float y, float frequency, int octaveCount, float persistence, float lacunarity, long seed)
-    {
-        float value = 0f;
-        float amplitude = 1f;
-        float currentFrequency = frequency;
-
-        for (int i = 0; i < octaveCount; i++)
-        {
-            float perlinValue = Mathf.PerlinNoise(x * currentFrequency + seed, y * currentFrequency + seed) * amplitude;
-            if (perlinValue == 0 || Mathf.Approximately(perlinValue, 1f)) Debug.Log("Perlin value is 0 or 1");
-            value += perlinValue;
-            currentFrequency *= lacunarity;
-            amplitude *= persistence;
-        }
-        return value;
     }
 
     private Mesh InitMesh()
@@ -108,7 +73,7 @@ public class DirtLand : MonoBehaviour
         {
             for (int z = 0; z < _gridDensity; z++)
             {
-                height = PerlinNoise(x + _perlinOffset.x, z + _perlinOffset.z, _frequency, _octaveCount, _persistence, _lacunarity, _seed);
+                height = Calculate.PerlinNoise(x + _perlinOffset.x, z + _perlinOffset.z, _frequency, _octaveCount, _persistence, _lacunarity, _seed);
 
                 worldPosVertex.Set(x * step + _perlinOffset.x / (_gridDensity - 1) * _meshSize, 
                                    z * step + _perlinOffset.z / (_gridDensity - 1) * _meshSize);
