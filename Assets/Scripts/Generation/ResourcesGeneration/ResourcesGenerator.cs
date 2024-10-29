@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 
 using Resources;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Generation.ResourcesGeneration
