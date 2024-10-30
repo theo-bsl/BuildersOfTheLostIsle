@@ -110,9 +110,9 @@ namespace Generation.ResourcesGeneration
         
         private void InitResourcesList()
         {
-            _resources.Add(ResourceType.Trees, new List<GameObject>());
-            _resources.Add(ResourceType.Rocks, new List<GameObject>());
-            _resources.Add(ResourceType.Bushes, new List<GameObject>());
+            _resources.Add(ResourceType.Wood, new List<GameObject>());
+            _resources.Add(ResourceType.Iron, new List<GameObject>());
+            _resources.Add(ResourceType.Food, new List<GameObject>());
         }
 
         private void VerifyResourcesPoucentage()
@@ -143,9 +143,9 @@ namespace Generation.ResourcesGeneration
             // Dictionnaire des limites maximales de chaque type de ressource
             var resourceLimits = new Dictionary<ResourceType, int>
             {
-                { ResourceType.Trees,  _pourcentTrees  * _nbMaxResources / 100 },
-                { ResourceType.Rocks,  _pourcentRocks  * _nbMaxResources / 100 },
-                { ResourceType.Bushes, _pourcentBushes * _nbMaxResources / 100 },
+                { ResourceType.Wood,  _pourcentTrees  * _nbMaxResources / 100 },
+                { ResourceType.Iron,  _pourcentRocks  * _nbMaxResources / 100 },
+                { ResourceType.Food, _pourcentBushes * _nbMaxResources / 100 },
             };
 
             int nbResourcesAvailable = _nbMaxResources;
@@ -160,9 +160,9 @@ namespace Generation.ResourcesGeneration
             }
 
             // Assignation des valeurs calculées aux variables correspondantes
-            _nbTrees = resourceValues[ResourceType.Trees];
-            _nbRocks = resourceValues[ResourceType.Rocks];
-            _nbBushes = resourceValues[ResourceType.Bushes];
+            _nbTrees = resourceValues[ResourceType.Wood];
+            _nbRocks = resourceValues[ResourceType.Iron];
+            _nbBushes = resourceValues[ResourceType.Food];
         }
         
         private void SetRandomOrientation(ref Vector3 orientation)
@@ -203,7 +203,7 @@ namespace Generation.ResourcesGeneration
                 SetRandomOrientation(ref orientation);
                 
                 GameObject rock = Instantiate(_rocksPrefabs[Random.Range(0, _rocksPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _rocksHolder.transform);
-                _resources[ResourceType.Rocks].Add(rock);
+                _resources[ResourceType.Iron].Add(rock);
             }
 
             for (int i = 0; i < _nbBushes; i++, index++)
@@ -213,7 +213,7 @@ namespace Generation.ResourcesGeneration
                 SetRandomOrientation(ref orientation);
                 
                 GameObject bush = Instantiate(_bushesPrefabs[Random.Range(0, _bushesPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _bushesHolder.transform);
-                _resources[ResourceType.Bushes].Add(bush);
+                _resources[ResourceType.Food].Add(bush);
             }
         }
 
@@ -242,7 +242,7 @@ namespace Generation.ResourcesGeneration
                 resourcesPosition.y = GetResourceHeight(resourcesPosition);
                 SetRandomOrientation(ref orientation);
                 
-                _resources[ResourceType.Trees].Add(Instantiate(_treesPrefabs[Random.Range(0, _treesPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _treesHolder.transform));
+                _resources[ResourceType.Wood].Add(Instantiate(_treesPrefabs[Random.Range(0, _treesPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _treesHolder.transform));
             }
         }
         

@@ -2,8 +2,8 @@ namespace Resources
 {
     public enum ResourceType
     {
-        Trees,
-        Rocks,
-        Bushes
+        Wood,
+        Iron,
+        Food
     }
 }
