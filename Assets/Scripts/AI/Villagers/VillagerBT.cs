@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AI.BT;
 using AI.Villagers.Harvest;
 using AI.Villagers.Harvest.Horse;
+using AI.Villagers.Harvest.Tools;
 using AI.Villagers.Order;
 using Resources;
 using UnityEngine;
@@ -51,6 +52,7 @@ namespace AI.Villagers
             root.AddChild(CreateCheckNeedResourceNode(resourceType));
             root.AddChild(CreateFindResourceNode(resourceType));
             root.AddChild(CreateHorseSubtree());
+            root.AddChild(CreateToolsSubtree());
 
             return root;
         }
@@ -83,7 +85,7 @@ namespace AI.Villagers
             {
                 new Sequence(new List<Node>()
                 {
-                    new CanHaveHorse(),
+                    new CanHaveHorse(()=> _blackboard.NeedHorse),
                     new FindStable(),
                     new GoToStable(),
                     new TakeHorse()
@@ -92,5 +94,19 @@ namespace AI.Villagers
             });
         }
         
+        private Node CreateToolsSubtree()
+        {
+            return new Selector(new List<Node>()
+            {
+                new Sequence(new List<Node>()
+                {
+                    new CanHaveTools(()=> _blackboard.NeedTools),
+                    new FindTools(),
+                    new GoToTools(),
+                    new TakeTools()
+                }),
+                new SkipToNextAction()
+            });
+        }
     }
 }

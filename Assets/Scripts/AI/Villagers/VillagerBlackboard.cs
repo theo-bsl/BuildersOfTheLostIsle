@@ -13,6 +13,10 @@ namespace AI.Villagers
 
         public bool NeedFood { get; set; }
         
+        public bool NeedHorse { get; set; }
+        
+        public bool NeedTools { get; set; }
+        
         public bool HasHorse { get; set; }
         
         public bool HasTools { get; set; }
