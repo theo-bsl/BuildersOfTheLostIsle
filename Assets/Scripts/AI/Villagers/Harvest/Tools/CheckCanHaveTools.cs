@@ -3,11 +3,11 @@ using AI.BT;
 
 namespace AI.Villagers.Harvest.Tools
 {
-    public class CanHaveTools : Node
+    public class CheckCanHaveTools : Node
     {
         private readonly Func<bool> _canHaveTools;
 
-        public CanHaveTools(Func<bool> canHaveTools)
+        public CheckCanHaveTools(Func<bool> canHaveTools)
         {
             _canHaveTools = canHaveTools;
         }

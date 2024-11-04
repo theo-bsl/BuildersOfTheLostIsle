@@ -3,11 +3,11 @@ using AI.BT;
 
 namespace AI.Villagers.Harvest.Horse
 {
-    public class HaveHorse : Node
+    public class CheckHaveHorse : Node
     {
         private readonly Func<bool> _checkHaveHorse;
 
-        public HaveHorse(Func<bool> checkHaveHorse)
+        public CheckHaveHorse(Func<bool> checkHaveHorse)
         {
             _checkHaveHorse = checkHaveHorse;
         }

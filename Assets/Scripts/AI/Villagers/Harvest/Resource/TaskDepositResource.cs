@@ -3,11 +3,11 @@ using Resources;
 
 namespace AI.Villagers.Harvest.Resource
 {
-    public class DepositResource : Node
+    public class TaskDepositResource : Node
     {
         private ResourceType _resourceType;
         
-        public DepositResource(ResourceType resourceType)
+        public TaskDepositResource(ResourceType resourceType)
         {
             _resourceType = resourceType;
         }

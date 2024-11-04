@@ -79,9 +79,9 @@ namespace AI.Villagers
         {
             return resourceType switch
             {
-                ResourceType.Wood => new FindResource(resourceType),
-                ResourceType.Food => new FindResource(resourceType),
-                ResourceType.Iron => new FindResource(resourceType),
+                ResourceType.Wood => new TaskFindResource(resourceType),
+                ResourceType.Food => new TaskFindResource(resourceType),
+                ResourceType.Iron => new TaskFindResource(resourceType),
                 _ => null
             };
         }
@@ -92,10 +92,10 @@ namespace AI.Villagers
             {
                 new Sequence(new List<Node>()
                 {
-                    new CanHaveHorse(()=> _blackboard.NeedHorse),
-                    new FindStable(),
-                    new GoToStable(),
-                    new TakeHorse()
+                    new CheckCanHaveHorse(()=> _blackboard.NeedHorse),
+                    new TaskFindStable(),
+                    new TaskGoToStable(),
+                    new TaskTakeHorse()
                 }),
                 new SkipToNextAction()
             });
@@ -107,10 +107,10 @@ namespace AI.Villagers
             {
                 new Sequence(new List<Node>()
                 {
-                    new CanHaveTools(()=> _blackboard.NeedTools),
-                    new FindTools(),
-                    new GoToTools(),
-                    new TakeTools()
+                    new CheckCanHaveTools(()=> _blackboard.NeedTools),
+                    new TaskFindTools(),
+                    new TaskGoToTools(),
+                    new TaskTakeTools()
                 }),
                 new SkipToNextAction()
             });
@@ -122,9 +122,9 @@ namespace AI.Villagers
             {
                 new Sequence(new List<Node>()
                 {
-                    new HaveTools(()=> _blackboard.HasTools),
-                    new GoToTools(),
-                    new ReturnTools()
+                    new CheckHaveTools(()=> _blackboard.HasTools),
+                    new TaskGoToTools(),
+                    new TaskReturnTools()
                 }),
                 new SkipToNextAction()
             });
@@ -136,9 +136,9 @@ namespace AI.Villagers
             {
                 new Sequence(new List<Node>()
                 {
-                    new HaveHorse(()=> _blackboard.HasHorse),
-                    new GoToStable(),
-                    new ReturnHorse()
+                    new CheckHaveHorse(()=> _blackboard.HasHorse),
+                    new TaskGoToStable(),
+                    new TaskReturnHorse()
                 }),
                 new SkipToNextAction()
             });
@@ -148,8 +148,8 @@ namespace AI.Villagers
         {
             return new Sequence(new List<Node>()
             {
-                new GoToStorage(),
-                new DepositResource(resourceType)
+                new TaskGoToStorage(),
+                new TaskDepositResource(resourceType)
             });
         }
     }

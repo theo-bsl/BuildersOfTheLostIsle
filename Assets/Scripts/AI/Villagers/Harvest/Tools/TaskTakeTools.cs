@@ -1,8 +1,8 @@
 using AI.BT;
 
-namespace AI.Villagers.Harvest.Resource
+namespace AI.Villagers.Harvest.Tools
 {
-    public class GoToStorage : Node
+    public class TaskTakeTools : Node
     {
         public override NodeState Evaluate()
         {

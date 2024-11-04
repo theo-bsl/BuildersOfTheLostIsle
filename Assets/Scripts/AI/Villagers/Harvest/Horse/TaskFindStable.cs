@@ -1,8 +1,8 @@
 using AI.BT;
 
-namespace AI.Villagers.Harvest.Tools
+namespace AI.Villagers.Harvest.Horse
 {
-    public class FindTools : Node
+    public class TaskFindStable : Node
     {
         public override NodeState Evaluate()
         {

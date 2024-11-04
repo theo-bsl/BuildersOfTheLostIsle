@@ -2,7 +2,7 @@ using AI.BT;
 
 namespace AI.Villagers.Harvest.Horse
 {
-    public class ReturnHorse : Node
+    public class TaskGoToStable : Node
     {
         public override NodeState Evaluate()
         {
