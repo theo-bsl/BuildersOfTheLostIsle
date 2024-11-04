@@ -51,8 +51,12 @@ namespace AI.Villagers
             
             root.AddChild(CreateCheckNeedResourceNode(resourceType));
             root.AddChild(CreateFindResourceNode(resourceType));
-            root.AddChild(CreateHorseSubtree());
-            root.AddChild(CreateToolsSubtree());
+            root.AddChild(CreateGetHorseSubtree());
+            root.AddChild(CreateGetToolsSubtree());
+            
+            //root.AddChild(new HarvestResource(resourceType));
+            
+            root.AddChild(CreateReturnToolsSubtree());
 
             return root;
         }
@@ -79,7 +83,7 @@ namespace AI.Villagers
             };
         }
 
-        private Node CreateHorseSubtree()
+        private Node CreateGetHorseSubtree()
         {
             return new Selector(new List<Node>()
             {
@@ -94,7 +98,7 @@ namespace AI.Villagers
             });
         }
         
-        private Node CreateToolsSubtree()
+        private Node CreateGetToolsSubtree()
         {
             return new Selector(new List<Node>()
             {
@@ -104,6 +108,20 @@ namespace AI.Villagers
                     new FindTools(),
                     new GoToTools(),
                     new TakeTools()
+                }),
+                new SkipToNextAction()
+            });
+        }
+        
+        private Node CreateReturnToolsSubtree()
+        {
+            return new Selector(new List<Node>()
+            {
+                new Sequence(new List<Node>()
+                {
+                    new HasTools(()=> _blackboard.HasTools),
+                    new GoToTools(),
+                    new ReturnTools()
                 }),
                 new SkipToNextAction()
             });
