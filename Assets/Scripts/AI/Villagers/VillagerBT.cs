@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AI.BT;
 using AI.Villagers.Harvest;
 using AI.Villagers.Harvest.Horse;
+using AI.Villagers.Harvest.Resource;
 using AI.Villagers.Harvest.Tools;
 using AI.Villagers.Order;
 using Resources;
@@ -57,6 +58,8 @@ namespace AI.Villagers
             //root.AddChild(new HarvestResource(resourceType));
             
             root.AddChild(CreateReturnToolsSubtree());
+            root.AddChild(CreateReturnHorseSubtree());
+            root.AddChild(CreateDepositResourceSubtree(resourceType));
 
             return root;
         }
@@ -119,11 +122,34 @@ namespace AI.Villagers
             {
                 new Sequence(new List<Node>()
                 {
-                    new HasTools(()=> _blackboard.HasTools),
+                    new HaveTools(()=> _blackboard.HasTools),
                     new GoToTools(),
                     new ReturnTools()
                 }),
                 new SkipToNextAction()
+            });
+        }
+        
+        private Node CreateReturnHorseSubtree()
+        {
+            return new Selector(new List<Node>()
+            {
+                new Sequence(new List<Node>()
+                {
+                    new HaveHorse(()=> _blackboard.HasHorse),
+                    new GoToStable(),
+                    new ReturnHorse()
+                }),
+                new SkipToNextAction()
+            });
+        }
+        
+        private Node CreateDepositResourceSubtree(ResourceType resourceType)
+        {
+            return new Sequence(new List<Node>()
+            {
+                new GoToStorage(),
+                new DepositResource(resourceType)
             });
         }
     }

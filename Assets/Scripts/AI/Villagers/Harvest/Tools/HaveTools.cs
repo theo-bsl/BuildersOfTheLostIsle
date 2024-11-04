@@ -3,11 +3,11 @@ using AI.BT;
 
 namespace AI.Villagers.Harvest.Tools
 {
-    public class HasTools : Node
+    public class HaveTools : Node
     {
         private readonly Func<bool> _hasTools;
 
-        public HasTools(Func<bool> hasTools)
+        public HaveTools(Func<bool> hasTools)
         {
             _hasTools = hasTools;
         }
