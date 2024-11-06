@@ -1,5 +1,4 @@
 using AI.BT;
-using Resources;
 
 namespace AI.Villagers.Harvest.Resource
 {

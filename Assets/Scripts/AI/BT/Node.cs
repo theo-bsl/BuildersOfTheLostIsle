@@ -41,12 +41,17 @@ namespace AI.BT
 
         public virtual NodeState Evaluate() => NodeState.FAILURE;
 
-        public void SetData(string key, object value)
+        protected void SetData(string key, object value)
         {
             _dataContext[key] = value;
         }
+
+        protected void SetDataInParent(string key, object value)
+        {
+            parent?.SetData(key, value);
+        }
         
-        public void SetDataInParent(string key, object value)
+        public void SetDataInFirstParent(string key, object value)
         {
             if (parent == null)
             {
@@ -63,22 +68,27 @@ namespace AI.BT
             node?.SetData(key, value);
         }
 
-        public object GetData(string key)
+        private object GetData(string key)
         {
-            return _dataContext.TryGetValue(key, out var value) ? value : null;
+            return _dataContext[key];
         }
         
-        public object GetDataInParent(string key)
+        public bool TryGetData(string key, out object value)
         {
+            if (_dataContext.TryGetValue(key, out value))
+                return value != null;
+
             Node node = parent;
             while (node != null)
             {
+                value = node.GetData(key);
+                if (value != null)
+                    return value != null;
                 node = node.parent;
             }
-            
-            return GetData(key);
+            return false;
         }
-
+        
         public bool ClearData(string key)
         {
             if (_dataContext.ContainsKey(key))

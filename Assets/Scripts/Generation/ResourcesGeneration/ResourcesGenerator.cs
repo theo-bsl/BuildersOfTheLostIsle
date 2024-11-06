@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-using Resources;
 using Random = UnityEngine.Random;
 
 namespace Generation.ResourcesGeneration
 {
-    public class ResourcesGenerator : MonoBehaviour
+    public class ResourcesGenerator : Singleton<ResourcesGenerator>
     {
         public bool _refresh;
         
@@ -49,8 +48,9 @@ namespace Generation.ResourcesGeneration
         
         private List<Vector2> _spawnPoints = new List<Vector2>();
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _transform = transform;
         }
 
@@ -265,5 +265,7 @@ namespace Generation.ResourcesGeneration
                 Gizmos.DrawSphere(new Vector3(point.x + transform.position.x - _resourcesZoneSize/2f, 0, point.y  + transform.position.z - _resourcesZoneSize/2f), _distanceBetweenResources/10f);
             }
         }
+        
+        public Dictionary<ResourceType, List<GameObject>> Resources => _resources;
     }
 }

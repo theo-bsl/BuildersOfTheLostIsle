@@ -2,23 +2,29 @@ using System;
 using System.Collections.Generic;
 using AI.BT;
 using AI.Villagers.Harvest;
-using AI.Villagers.Harvest.Horse;
+using AI.Villagers.Harvest.Equipment;
 using AI.Villagers.Harvest.Resource;
-using AI.Villagers.Harvest.Tools;
 using AI.Villagers.Order;
-using Resources;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace AI.Villagers
 {
-    [RequireComponent(typeof(VillagerBlackboard))]
+    [RequireComponent(typeof(NavMeshAgent))]
     public class VillagerBT : BehaviorTree
     {
+        [SerializeField] private float _movementSpeed;
+        [SerializeField] private float _minDistanceToTarget;
+        
+        private Transform _transform;
+        private NavMeshAgent _navMeshAgent;
         private VillagerBlackboard _blackboard;
 
         private void Awake()
         {
-            _blackboard = GetComponent<VillagerBlackboard>();
+            _transform = transform;
+            _navMeshAgent = GetComponent<NavMeshAgent>();
+            _blackboard = new VillagerBlackboard();
         }
 
         protected override Node SetupTree()
@@ -29,8 +35,7 @@ namespace AI.Villagers
             
             foreach (ResourceType resourceType in Enum.GetValues(typeof(ResourceType)))
             {
-                Node harvestSubtree = CreateHarvestSubtree(resourceType);
-                root.AddChild(harvestSubtree);
+                root.AddChild(CreateHarvestSubtree(resourceType));
             }
 
             return root;
@@ -50,95 +55,45 @@ namespace AI.Villagers
             // Create the root node
             Sequence root = new Sequence();
             
-            root.AddChild(CreateCheckNeedResourceNode(resourceType));
-            root.AddChild(CreateFindResourceNode(resourceType));
-            root.AddChild(CreateGetHorseSubtree());
-            root.AddChild(CreateGetToolsSubtree());
+            root.AddChild(new CheckNeedResource(_blackboard.NeedResource));
+            root.AddChild(new TaskFindResource());
+            root.AddChild(CreateGetEquipmentSubtree(EquipmentType.Horse));
+            root.AddChild(CreateGetEquipmentSubtree(EquipmentType.Tools));
             
+            root.AddChild(new TaskGoToTarget(_transform, _navMeshAgent, _movementSpeed, _minDistanceToTarget));
             //root.AddChild(new HarvestResource(resourceType));
             
-            root.AddChild(CreateReturnToolsSubtree());
-            root.AddChild(CreateReturnHorseSubtree());
+            root.AddChild(CreateReturnEquipmentSubtree(EquipmentType.Tools));
+            root.AddChild(CreateReturnEquipmentSubtree(EquipmentType.Horse));
             root.AddChild(CreateDepositResourceSubtree(resourceType));
 
             return root;
         }
-
-        private Node CreateCheckNeedResourceNode(ResourceType resourceType)
-        {
-            return resourceType switch
-            {
-                ResourceType.Wood => new CheckNeedResource(() => _blackboard.NeedWood),
-                ResourceType.Food => new CheckNeedResource(() => _blackboard.NeedIron),
-                ResourceType.Iron => new CheckNeedResource(() => _blackboard.NeedFood),
-                _ => null
-            };
-        }
         
-        private Node CreateFindResourceNode(ResourceType resourceType)
-        {
-            return resourceType switch
-            {
-                ResourceType.Wood => new TaskFindResource(resourceType),
-                ResourceType.Food => new TaskFindResource(resourceType),
-                ResourceType.Iron => new TaskFindResource(resourceType),
-                _ => null
-            };
-        }
-
-        private Node CreateGetHorseSubtree()
+        private Node CreateGetEquipmentSubtree(EquipmentType equipmentType)
         {
             return new Selector(new List<Node>()
             {
                 new Sequence(new List<Node>()
                 {
-                    new CheckCanHaveHorse(()=> _blackboard.NeedHorse),
-                    new TaskFindStable(),
-                    new TaskGoToStable(),
-                    new TaskTakeHorse()
+                    new CheckEquipment(equipmentType, _blackboard.IsEquipmentNeeded),
+                    new TaskFindEquipmentBuilding(),//-------------------------------------------------------------------------------------------
+                    new TaskGoToTarget(_transform, _navMeshAgent, _movementSpeed, _minDistanceToTarget),
+                    new TaskTakeEquipment()//-------------------------------------------------------------------------------------------
                 }),
                 new SkipToNextAction()
             });
         }
         
-        private Node CreateGetToolsSubtree()
+        private Node CreateReturnEquipmentSubtree(EquipmentType equipmentType)
         {
             return new Selector(new List<Node>()
             {
                 new Sequence(new List<Node>()
                 {
-                    new CheckCanHaveTools(()=> _blackboard.NeedTools),
-                    new TaskFindTools(),
-                    new TaskGoToTools(),
-                    new TaskTakeTools()
-                }),
-                new SkipToNextAction()
-            });
-        }
-        
-        private Node CreateReturnToolsSubtree()
-        {
-            return new Selector(new List<Node>()
-            {
-                new Sequence(new List<Node>()
-                {
-                    new CheckHaveTools(()=> _blackboard.HasTools),
-                    new TaskGoToTools(),
-                    new TaskReturnTools()
-                }),
-                new SkipToNextAction()
-            });
-        }
-        
-        private Node CreateReturnHorseSubtree()
-        {
-            return new Selector(new List<Node>()
-            {
-                new Sequence(new List<Node>()
-                {
-                    new CheckHaveHorse(()=> _blackboard.HasHorse),
-                    new TaskGoToStable(),
-                    new TaskReturnHorse()
+                    new CheckEquipment(equipmentType, _blackboard.IsEquipmentAvailable),
+                    new TaskGoToTarget(_transform, _navMeshAgent, _movementSpeed, _minDistanceToTarget),
+                    new TaskReturnEquipment()//-------------------------------------------------------------------------------------------
                 }),
                 new SkipToNextAction()
             });
@@ -148,8 +103,8 @@ namespace AI.Villagers
         {
             return new Sequence(new List<Node>()
             {
-                new TaskGoToStorage(),
-                new TaskDepositResource(resourceType)
+                new TaskGoToStorage(),//-------------------------------------------------------------------------------------------
+                new TaskDepositResource(resourceType)//-------------------------------------------------------------------------------------------
             });
         }
     }

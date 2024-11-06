@@ -13,6 +13,11 @@ namespace AI.BT
 
             foreach (Node node in children)
             {
+                if (anyChildIsRunning)
+                {
+                    break;
+                }
+                
                 switch (node.Evaluate())
                 {
                     case NodeState.FAILURE:
@@ -32,7 +37,5 @@ namespace AI.BT
             state = anyChildIsRunning ? NodeState.RUNNING : NodeState.SUCCESS;
             return state;
         }
-
     }
-
 }
