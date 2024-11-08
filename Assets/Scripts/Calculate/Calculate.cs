@@ -60,5 +60,15 @@ namespace Calcul
             }
             return value;
         }
+        
+        public static float GetHeight(Vector3 position, LayerMask layerMask)
+        {
+            if (Physics.Raycast(position + Vector3.up * 100, Vector3.down, out RaycastHit hit, 200, layerMask.value))
+            {
+                return hit.point.y;
+            }
+
+            return 0;
+        }
     }
 }
