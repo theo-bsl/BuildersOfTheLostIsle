@@ -165,9 +165,9 @@ namespace Generation.ResourcesGeneration
             }
 
             // Assignation des valeurs calculées aux variables correspondantes
-            _nbForests = resourceValues[ResourceType.Trees];
-            _nbRocks = resourceValues[ResourceType.Rocks];
-            _nbBushes = resourceValues[ResourceType.Bushes];
+            _nbForests = resourceValues[ResourceType.Wood];
+            _nbRocks = resourceValues[ResourceType.Iron];
+            _nbBushes = resourceValues[ResourceType.Food];
             _totalResources = _nbForests + _nbRocks + _nbBushes;
         }
         
@@ -202,9 +202,9 @@ namespace Generation.ResourcesGeneration
 
             int index = 0;
             
-            GenerateResource(ResourceType.Trees,  _nbForests, _spawnPoints, ref index, offset, _treesPrefabs,  _treesHolder.transform);
-            GenerateResource(ResourceType.Rocks,  _nbRocks,   _spawnPoints, ref index, offset, _rocksPrefabs,  _rocksHolder.transform);
-            GenerateResource(ResourceType.Bushes, _nbBushes,  _spawnPoints, ref index, offset, _bushesPrefabs, _bushesHolder.transform);
+            GenerateResource(ResourceType.Wood,  _nbForests, _spawnPoints, ref index, offset, _treesPrefabs,  _treesHolder.transform);
+            GenerateResource(ResourceType.Iron,  _nbRocks,   _spawnPoints, ref index, offset, _rocksPrefabs,  _rocksHolder.transform);
+            GenerateResource(ResourceType.Food, _nbBushes,  _spawnPoints, ref index, offset, _bushesPrefabs, _bushesHolder.transform);
         }
 
         private void GenerateResource(ResourceType resourceType, int nbResources, List<Vector2> spawnPoints, ref int spawnPointsIndex, Vector2 positionOffset, List<GameObject> resourcePrefabs, Transform resourcesHolder)
