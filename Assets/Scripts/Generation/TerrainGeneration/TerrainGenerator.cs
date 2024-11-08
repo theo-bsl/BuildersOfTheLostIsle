@@ -171,4 +171,6 @@ public class TerrainGenerator : Singleton<TerrainGenerator>
     
     public int GroundSize => _worldSize * _meshSize - _shapeDistance;
     public int WorldSize => _worldSize * _meshSize;
+    public int ShapeDistance => _shapeDistance;
+    public float ShapePower => _shapePower;
 }
