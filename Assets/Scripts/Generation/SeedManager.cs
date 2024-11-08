@@ -5,8 +5,8 @@ public class SeedManager : Singleton<SeedManager>
     [Header("Seed Settings")]
     [SerializeField] private int seed = 0;
     [SerializeField] private string islandName = default;
-    
-    private void Awake()
+
+    protected override void Awake()
     {
         ComputeSeed();
         SetSeed();

@@ -17,16 +17,15 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>
             
             Debug.LogError("New " + typeof(T) + " Instantiated");
             return new GameObject("New " + typeof(T)).AddComponent<T>();
-
         }
     }
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         if (_instance != null)
         {
             Debug.LogError(typeof(T) + " Already exist");
-            Destroy(this.gameObject);
+            Destroy(gameObject == _instance.gameObject ? this : gameObject);
             return;
         }
 
@@ -34,5 +33,10 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>
             DontDestroyOnLoad(gameObject);
 
         _instance = this as T;
+    }
+
+    private void OnDestroy()
+    {
+        _instance = null;
     }
 }

@@ -4,12 +4,11 @@ using System.Linq;
 using Calcul;
 using UnityEngine;
 
-using Resources;
 using Random = UnityEngine.Random;
 
 namespace Generation.ResourcesGeneration
 {
-    public class ResourcesGenerator : MonoBehaviour
+    public class ResourcesGenerator : Singleton<ResourcesGenerator>
     {
         public bool _refresh;
         
@@ -52,8 +51,9 @@ namespace Generation.ResourcesGeneration
         
         private List<Vector2> _spawnPoints = new List<Vector2>();
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             _transform = transform;
         }
 
@@ -115,9 +115,9 @@ namespace Generation.ResourcesGeneration
         
         private void InitResourcesList()
         {
-            _resources.Add(ResourceType.Trees, new List<GameObject>());
-            _resources.Add(ResourceType.Rocks, new List<GameObject>());
-            _resources.Add(ResourceType.Bushes, new List<GameObject>());
+            _resources.Add(ResourceType.Wood, new List<GameObject>());
+            _resources.Add(ResourceType.Iron, new List<GameObject>());
+            _resources.Add(ResourceType.Food, new List<GameObject>());
         }
 
         private void VerifyResourcesPoucentage()
@@ -148,9 +148,9 @@ namespace Generation.ResourcesGeneration
             // Dictionnaire des limites maximales de chaque type de ressource
             var resourceLimits = new Dictionary<ResourceType, int>
             {
-                { ResourceType.Trees,  _pourcentTrees  * _nbMaxResources / 100 },
-                { ResourceType.Rocks,  _pourcentRocks  * _nbMaxResources / 100 },
-                { ResourceType.Bushes, _pourcentBushes * _nbMaxResources / 100 },
+                { ResourceType.Wood,  _pourcentTrees  * _nbMaxResources / 100 },
+                { ResourceType.Iron,  _pourcentRocks  * _nbMaxResources / 100 },
+                { ResourceType.Food, _pourcentBushes * _nbMaxResources / 100 },
             };
 
             int nbResourcesAvailable = _nbMaxResources;
@@ -252,7 +252,7 @@ namespace Generation.ResourcesGeneration
                 resourcesPosition.y = Calculate.GetHeight(resourcesPosition, _groundLayerMask);
                 SetRandomOrientation(ref orientation);
                 
-                _resources[ResourceType.Trees].Add(Instantiate(_treesPrefabs[Random.Range(0, _treesPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _treesHolder.transform));
+                _resources[ResourceType.Wood].Add(Instantiate(_treesPrefabs[Random.Range(0, _treesPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _treesHolder.transform));
             }
         }
 
@@ -265,5 +265,7 @@ namespace Generation.ResourcesGeneration
                 Gizmos.DrawSphere(new Vector3(point.x + transform.position.x - _resourcesZoneSize/2f, 0, point.y  + transform.position.z - _resourcesZoneSize/2f), _distanceBetweenResources/10f);
             }
         }
+        
+        public Dictionary<ResourceType, List<GameObject>> Resources => _resources;
     }
 }

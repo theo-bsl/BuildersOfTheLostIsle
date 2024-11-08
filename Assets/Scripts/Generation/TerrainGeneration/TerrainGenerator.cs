@@ -46,7 +46,7 @@ public class TerrainGenerator : Singleton<TerrainGenerator>
     private readonly List<DirtLand> _dirtLands  = new List<DirtLand>();
     private readonly List<WaterLand> _waterLands = new List<WaterLand>();
 
-    private new void Awake()
+    protected override void Awake()
     {
         base.Awake();
         
