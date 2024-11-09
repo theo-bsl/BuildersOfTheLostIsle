@@ -8,11 +8,15 @@ namespace Resources
     {
         [Header("Forest Settings")]
         [SerializeField] private float _distanceBetweenTrees;
+        
+        [SerializeField] private Vector2 _forestSize;
         [SerializeField] private float _minDistanceBetweenTrees;
         [SerializeField] private float _maxDistanceBetweenTrees;
-        [SerializeField] private Vector2 _forestSize;
+        
         [SerializeField] private int _rejectionSamples;
+        
         [SerializeField] private LayerMask _groundLayerMask;
+        
         [SerializeField] private List<GameObject> _treesPrefabs;
 
         private Transform _transform;
@@ -42,6 +46,16 @@ namespace Resources
                 
                 Instantiate(_treesPrefabs[Random.Range(0, _treesPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _transform);
             }
+        }
+
+        public void SetSettings(ResourcesGenerationSettings settings)
+        {
+            _forestSize = settings.forestSize;
+            _minDistanceBetweenTrees = settings.minDistanceBetweenTrees;
+            _maxDistanceBetweenTrees = settings.maxDistanceBetweenTrees;
+
+            _rejectionSamples = settings.resourcesZoneSize;
+            _groundLayerMask = settings.groundLayerMask;
         }
     }
 }

@@ -2,42 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Calcul;
+using Resources;
 using UnityEngine;
-
+using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Generation.ResourcesGeneration
 {
-    public class ResourcesGenerator : Singleton<ResourcesGenerator>
+    public class ResourcesGenerator
     {
-        public bool _refresh;
-        
-        [Header("Options")]
-        [SerializeField] private LayerMask _groundLayerMask = default;
-        
-        [Header("Global Generation Settings")]
-        [SerializeField] private float _distanceBetweenResources = 1;
-        [SerializeField] private int _rejectionSamples = 30;
-        
-        [Header("Forest Generation Settings")]
-        [SerializeField] private float _distanceBetweenTrees = 1;
-        [SerializeField] private Vector2 _forestSize = new Vector2(5, 5);
-        
-        [Header("Max Resources")]
-        [SerializeField] private int _nbMaxResources = default;
-        [SerializeField, Range(1, 100)] private int _pourcentTrees  = default;
-        [SerializeField, Range(1, 100)] private int _pourcentRocks  = default;
-        [SerializeField, Range(1, 100)] private int _pourcentBushes = default;
-    
-        [Header("Resources Prefabs")]
-        [SerializeField] private List<GameObject> _treesPrefabs;
-        [SerializeField] private List<GameObject> _rocksPrefabs;
-        [SerializeField] private List<GameObject> _bushesPrefabs;
-    
-        private Transform _transform;
-        private int _resourcesZoneSize;
-        private Vector2 _resourcesZoneCenter;
-        private int _maxDistance;
         private int _totalResources;
         private int _nbForests  = 0;
         private int _nbRocks  = 0;
@@ -47,91 +20,36 @@ namespace Generation.ResourcesGeneration
         private GameObject _rocksHolder;
         private GameObject _bushesHolder;
         
-        private readonly Dictionary<ResourceType, List<GameObject>> _resources = new();
-        
-        private List<Vector2> _spawnPoints = new List<Vector2>();
-
-        protected override void Awake()
+        public ResourcesGenerator(Transform holdersParent)
         {
-            base.Awake();
-            _transform = transform;
+            InitHolders(holdersParent);
         }
 
-        public void Init()
-        {
-            _resourcesZoneSize = TerrainGenerator.Instance.GroundSize;
-            _maxDistance = TerrainGenerator.Instance.ShapeDistance;
-            
-            InitPosition();
-        
-            InitHolders();
-            InitResourcesList();
-            
-            GenerateAllResources();
-        }
-
-        private void Update()
-        {
-            if (!_refresh) return;
-            _refresh = false;
-            
-            _nbMaxResources = 150;
-        
-            ClearResources();
-            VerifyResourcesPoucentage();
-            SetNbResources(_nbMaxResources);
-            GenerateAllResources();
-        }
-
-        private void ClearResources()
-        {
-            foreach (var resources in _resources.Values)
-            {
-                foreach (var resource in resources)
-                {
-                    Destroy(resource);
-                }
-                resources.Clear();
-            }
-        }
-
-        private void InitPosition()
-        {
-            int worldSize = TerrainGenerator.Instance.WorldSize;
-            _resourcesZoneCenter = new Vector2(worldSize / 2f, worldSize / 2f);
-            _transform.position = new Vector3(worldSize / 2f, 0, worldSize / 2f);
-        }
-
-        private void InitHolders()
+        private void InitHolders(Transform holdersParent)
         {
             _treesHolder  = new GameObject("Trees");
             _rocksHolder  = new GameObject("Rocks");
             _bushesHolder = new GameObject("Bushes");
         
-            _treesHolder.transform.SetParent(_transform);
-            _rocksHolder.transform.SetParent(_transform);
-            _bushesHolder.transform.SetParent(_transform);
-        }
-        
-        private void InitResourcesList()
-        {
-            _resources.Add(ResourceType.Wood, new List<GameObject>());
-            _resources.Add(ResourceType.Iron, new List<GameObject>());
-            _resources.Add(ResourceType.Food, new List<GameObject>());
+            _treesHolder.transform.SetParent(holdersParent);
+            _rocksHolder.transform.SetParent(holdersParent);
+            _bushesHolder.transform.SetParent(holdersParent);
         }
 
-        private void VerifyResourcesPoucentage()
+        private (int, int, int) VerifyResourcesPoucentage(float pourcentTrees, float pourcentRocks, float pourcentBushes)
         {
-            float totalPercentage = _pourcentTrees + _pourcentRocks + _pourcentBushes;
+            float totalPercentage = pourcentTrees + pourcentRocks + pourcentBushes;
 
             // Normaliser les pourcentages si la somme dépasse 100%
             if (totalPercentage > 100f)
             {
                 float normalizationFactor = 100f / totalPercentage;
-                _pourcentTrees  = (int)(_pourcentTrees  * normalizationFactor);
-                _pourcentRocks  = (int)(_pourcentRocks  * normalizationFactor);
-                _pourcentBushes = (int)(_pourcentBushes * normalizationFactor);
+                pourcentTrees  = (int)(pourcentTrees  * normalizationFactor);
+                pourcentRocks  = (int)(pourcentRocks  * normalizationFactor);
+                pourcentBushes = (int)(pourcentBushes * normalizationFactor);
             }
+            
+            return ((int)pourcentTrees, (int)pourcentRocks, (int)pourcentBushes);
         }
 
         private int SetNbMaxResources(int maxResources, int maxGlobalResources)
@@ -139,21 +57,21 @@ namespace Generation.ResourcesGeneration
             return Mathf.Min(Random.Range(maxResources / 2, maxResources), maxGlobalResources);
         }
     
-        private void SetNbResources(int nbSpawnPoints)
+        private void SetNbResources(int nbSpawnPoints, ResourcesGenerationSettings settings)
         {
-            VerifyResourcesPoucentage();
+            (_nbForests, _nbRocks, _nbBushes) = VerifyResourcesPoucentage(settings.pourcentForests, settings.pourcentRocks, settings.pourcentBushes);
             
-            _nbMaxResources = (int)MathF.Min(_nbMaxResources, nbSpawnPoints);
+            settings.nbMaxResources = (int)MathF.Min(settings.nbMaxResources, nbSpawnPoints);
 
             // Dictionnaire des limites maximales de chaque type de ressource
             var resourceLimits = new Dictionary<ResourceType, int>
             {
-                { ResourceType.Wood,  _pourcentTrees  * _nbMaxResources / 100 },
-                { ResourceType.Iron,  _pourcentRocks  * _nbMaxResources / 100 },
-                { ResourceType.Food, _pourcentBushes * _nbMaxResources / 100 },
+                { ResourceType.Wood, settings.pourcentForests  * settings.nbMaxResources / 100 },
+                { ResourceType.Iron, settings.pourcentRocks  * settings.nbMaxResources / 100 },
+                { ResourceType.Food, settings.pourcentBushes * settings.nbMaxResources / 100 },
             };
 
-            int nbResourcesAvailable = _nbMaxResources;
+            int nbResourcesAvailable = settings.nbMaxResources;
             var resourceValues = new Dictionary<ResourceType, int>();
 
             // Distribution des ressources dans un ordre aléatoire
@@ -176,96 +94,74 @@ namespace Generation.ResourcesGeneration
             orientation.y = Random.Range(0, 360);
         }
 
-        private bool IsInResourceZone(Vector2 position)
+        private bool IsInResourceZone(Vector2 position, Vector2 center, float shapeDistance, float shapePower)
         {
-            float dist = Calculate.Distance(position, _resourcesZoneCenter, TerrainGenerator.Instance.ShapePower);
-            return dist < _maxDistance;
+            float dist = Calculate.Distance(position, center, shapePower);
+            return dist < shapeDistance;
         }
 
-        private void SetResourcePosition(ref Vector3 resourcePosition, Vector2 spawnPoint, Vector2 offset)
+        private void SetResourcePosition(ref Vector3 resourcePosition, Vector2 spawnPoint, Vector2 offset, LayerMask groundLayerMask)
         {
             resourcePosition.Set(spawnPoint.x + offset.x, 0, spawnPoint.y + offset.y);
-            resourcePosition.y = Calculate.GetHeight(resourcePosition, _groundLayerMask);
+            resourcePosition.y = Calculate.GetHeight(resourcePosition, groundLayerMask);
         }
 
-        private void GenerateAllResources()
+        public Dictionary<ResourceType, List<Transform>> GenerateAllResources(ResourcesGenerationSettings settings)
         {
-            _spawnPoints = PoissonDiscSampling.GeneratePoints(_distanceBetweenResources, new Vector2(_resourcesZoneSize, _resourcesZoneSize), _rejectionSamples, true);
-            _spawnPoints = _spawnPoints.OrderBy(x => Random.value).ToList();
+            Dictionary<ResourceType, List<Transform>> resources = new();
             
-            SetNbResources(_spawnPoints.Count);
-        
-            Vector3 resourcePosition = Vector3.zero;
-            Vector3 orientation = Vector3.zero;
+            List<Vector2> spawnPoints = PoissonDiscSampling.GeneratePoints(settings.distanceBetweenResources, new Vector2(settings.resourcesZoneSize, settings.resourcesZoneSize), settings.rejectionSamples, true);
+            spawnPoints = spawnPoints.OrderBy(x => Random.value).ToList();
             
-            Vector2 offset = new Vector2(_transform.position.x - _resourcesZoneSize / 2f, _transform.position.z - _resourcesZoneSize / 2f);
+            SetNbResources(spawnPoints.Count, settings);
+            
+            Vector2 offset = new Vector2(settings.offset, settings.offset);
 
             int index = 0;
             
-            GenerateResource(ResourceType.Wood,  _nbForests, _spawnPoints, ref index, offset, _treesPrefabs,  _treesHolder.transform);
-            GenerateResource(ResourceType.Iron,  _nbRocks,   _spawnPoints, ref index, offset, _rocksPrefabs,  _rocksHolder.transform);
-            GenerateResource(ResourceType.Food, _nbBushes,  _spawnPoints, ref index, offset, _bushesPrefabs, _bushesHolder.transform);
+            resources[ResourceType.Wood] = GenerateResource(ResourceType.Wood, _nbForests, spawnPoints, ref index, offset, _treesHolder.transform,  settings);
+            resources[ResourceType.Iron] = GenerateResource(ResourceType.Iron, _nbRocks,   spawnPoints, ref index, offset, _rocksHolder.transform,  settings);
+            resources[ResourceType.Food] = GenerateResource(ResourceType.Food, _nbBushes,  spawnPoints, ref index, offset, _bushesHolder.transform, settings);
+            
+            return resources;
         }
 
-        private void GenerateResource(ResourceType resourceType, int nbResources, List<Vector2> spawnPoints, ref int spawnPointsIndex, Vector2 positionOffset, List<GameObject> resourcePrefabs, Transform resourcesHolder)
+        private List<Transform> GenerateResource(ResourceType resourceType, int nbResources, List<Vector2> spawnPoints, ref int spawnPointsIndex, Vector2 positionOffset, Transform resourcesHolder, ResourcesGenerationSettings settings)
         {
+            List<Transform> resources = new List<Transform>();
+            Vector2 worldCenter = new Vector2(settings.resourcesZoneSize / 2f + settings.offset, settings.resourcesZoneSize / 2f + settings.offset);
             Vector3 resourcePosition = Vector3.zero;
             Vector3 orientation = Vector3.zero;
             
             for (int i = 0; i < nbResources; i++, spawnPointsIndex++)
             {
-                SetResourcePosition(ref resourcePosition, _spawnPoints[spawnPointsIndex], positionOffset);
+                SetResourcePosition(ref resourcePosition, spawnPoints[spawnPointsIndex], positionOffset, settings.groundLayerMask);
                 SetRandomOrientation(ref orientation);
                 
-                if (!IsInResourceZone(_spawnPoints[spawnPointsIndex] + positionOffset))
+                if (!IsInResourceZone(spawnPoints[spawnPointsIndex] + positionOffset, worldCenter, settings.shapeDistance, settings.shapePower))
                 {
-                    Debug.Log($"{resourceType} out of zone");
-                    Debug.Log($"At {resourcePosition}");
-                    
-                    bool isResourceSpawned = _resources[resourceType].Count > 0;
+                    bool isResourceSpawned = resources.Count > 0;
                     int remainingResources = nbResources - i;
-                    bool enoughSpawnPoints = _totalResources + 1 < _spawnPoints.Count && _totalResources + 1 < _nbMaxResources;
+                    bool enoughSpawnPoints = _totalResources + 1 < spawnPoints.Count && _totalResources + 1 < settings.nbMaxResources;
                     
                     if ((!isResourceSpawned && remainingResources == 0) || enoughSpawnPoints) // condition du if pas forcement bonne
                     {
                         i--;
                         continue;
                     }
-
-                    Debug.LogError($"No more {resourceType}");
                 }
                 
-                GameObject resource = Instantiate(resourcePrefabs[Random.Range(0, resourcePrefabs.Count)], resourcePosition, Quaternion.Euler(orientation), resourcesHolder);
-                _resources[resourceType].Add(resource);
+                GameObject resource = Object.Instantiate(settings.GetResourcePrefab(resourceType), resourcePosition, Quaternion.Euler(orientation), resourcesHolder);
+
+                if (resource.TryGetComponent<Forest>(out var forest))
+                {
+                    forest.SetSettings(settings);
+                }
+                    
+                resources.Add(resource.transform);
             }
-        }
-        
-        private void GenerateForest(Vector3 forestPosition)
-        {
-            List<Vector2> spawnPoints = PoissonDiscSampling.GeneratePoints(_distanceBetweenTrees, _forestSize, _rejectionSamples);
-            Vector3 resourcesPosition = Vector3.zero;
-            Vector3 orientation = Vector3.zero;
             
-            foreach (Vector2 point in spawnPoints)
-            {
-                resourcesPosition.Set(point.x + forestPosition.x, 0, point.y + forestPosition.z);
-                resourcesPosition.y = Calculate.GetHeight(resourcesPosition, _groundLayerMask);
-                SetRandomOrientation(ref orientation);
-                
-                _resources[ResourceType.Wood].Add(Instantiate(_treesPrefabs[Random.Range(0, _treesPrefabs.Count)], resourcesPosition, Quaternion.Euler(orientation), _treesHolder.transform));
-            }
+            return resources;
         }
-
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.DrawWireCube(transform.position, new Vector3(_resourcesZoneSize, 1, _resourcesZoneSize));
-
-            foreach (var point in _spawnPoints)
-            {
-                Gizmos.DrawSphere(new Vector3(point.x + transform.position.x - _resourcesZoneSize/2f, 0, point.y  + transform.position.z - _resourcesZoneSize/2f), _distanceBetweenResources/10f);
-            }
-        }
-        
-        public Dictionary<ResourceType, List<GameObject>> Resources => _resources;
     }
 }

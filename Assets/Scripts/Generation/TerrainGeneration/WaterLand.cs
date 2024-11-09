@@ -1,20 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class WaterLand : MonoBehaviour
 {
-    [Header("Chunk Settings")]
-    [Range(2, 255)] private int _gridDensity = default;
-    [Range(2, 100)] private float _meshSize = default;
+    [Range(2, 255)] private int _gridDensity;
+    [Range(2, 100)] private float _meshSize;
 
-    [Header("Water Settings")]
-    [Range(0, 10)] private float _waterLevel = default;
-
-    private void Start()
-    {
-        GenerateMesh();
-    }
+    private float _waterLevel;
 
     private Mesh InitMesh()
     {
