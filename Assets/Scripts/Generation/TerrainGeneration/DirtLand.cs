@@ -5,48 +5,34 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
 public class DirtLand : MonoBehaviour
 {
-    [Header("Option")]
-    private bool _islandify   = default;
-    private bool _shapeIsland = default;
-    private bool _makeLayer   = default;
-    
     [Header("Chunk Settings")]
-                   private float _worldSize       = default;
-    [Range(0, 5)]  private float _shapePower      = default;
-                   private float _shapeDistance   = default;
-    [Range(0, 15)] private float _groundElevation = default;
+                   private float _worldSize;
+    [Range(0, 5)]  private float _shapePower;
+                   private float _shapeDistance;
+    [Range(0, 15)] private float _groundElevation;
 
     [Header("Mesh Settings")]
-    [Range(2, 255)] private int     _gridDensity      = default;
-    [Range(2, 10)]  private int     _gridNbLayer      = default;
-    [Range(2, 100)] private int     _meshSize         = default;
-    [Range(1, 15)]  private float   _heightMultiplier = default;
+    [Range(2, 255)] private int     _gridDensity;
+    [Range(2, 100)] private int     _meshSize;
+    [Range(1, 15)]  private float   _heightMultiplier;
 
     [Header("Perlin Noise Settings")]
-                   private long    _seed           = default;
-    [Range(0, 1)]  private float   _frequency      = default;
-    [Range(1, 10)] private int     _octaveCount    = default;
-    [Range(0, 1)]  private float   _persistence    = default;
-                   private float   _lacunarity     = default;
-                   private Vector3 _perlinOffset = Vector3.zero;
+                   private long    _seed;
+    [Range(0, 1)]  private float   _frequency;
+    [Range(1, 10)] private int     _octaveCount;
+    [Range(0, 1)]  private float   _persistence;
+                   private float   _lacunarity;
+                   private Vector2 _perlinOffset;
     
-    private float Islandify(Vector2 vertexPosition, float elevation, float worldSize, int meshSize, bool shapeIsland = false, float shapeDistance = 0f, float shapePower = 0f)
+    private float Islandify(Vector2 vertexPosition, float elevation, float worldSize, int meshSize, float shapeDistance = 0f, float shapePower = 0f)
     {
         Vector2 worldCenter = Vector2.one * (worldSize * meshSize / 2);
 
-        //float dist = shapeIsland ? ShapeIsland(vertexPosition, worldCenter, shapePower) : Vector2.Distance(vertexPosition, worldCenter);
-        float dist = shapeIsland ? Calculate.Distance(vertexPosition, worldCenter, shapePower) : Vector2.Distance(vertexPosition, worldCenter);
+        float dist = Calculate.Distance(vertexPosition, worldCenter, shapePower);
         
         dist = -Calculate.Remap(dist, shapeDistance, worldSize * meshSize / 2, 0, 1) + 1;
 
         return -Mathf.Cos(Mathf.PI * dist) * elevation;
-    }
-
-    private float MakeLayer(float height, int nbLayer)
-    {
-        height *= nbLayer;
-        int heightInt = (int)height;
-        return (float)heightInt / nbLayer;
     }
 
     private Mesh InitMesh()
@@ -73,13 +59,12 @@ public class DirtLand : MonoBehaviour
         {
             for (int z = 0; z < _gridDensity; z++)
             {
-                height = Calculate.PerlinNoise(x + _perlinOffset.x, z + _perlinOffset.z, _frequency, _octaveCount, _persistence, _lacunarity, _seed);
+                height = Calculate.PerlinNoise(x + _perlinOffset.x, z + _perlinOffset.y, _frequency, _octaveCount, _persistence, _lacunarity, _seed);
 
                 worldPosVertex.Set(x * step + _perlinOffset.x / (_gridDensity - 1) * _meshSize, 
-                                   z * step + _perlinOffset.z / (_gridDensity - 1) * _meshSize);
+                                   z * step + _perlinOffset.y / (_gridDensity - 1) * _meshSize);
                 
-                height += _islandify ? Islandify(worldPosVertex, _groundElevation, _worldSize, _meshSize, _shapeIsland, _shapeDistance, _shapePower) : 0;
-                height = _makeLayer ? MakeLayer(height, _gridNbLayer) : height;
+                height += Islandify(worldPosVertex, _groundElevation, _worldSize, _meshSize, _shapeDistance, _shapePower);
 
                 vertex.Set(x * step, height * _heightMultiplier, z * step);
                 vertices.Add(vertex);
@@ -139,28 +124,20 @@ public class DirtLand : MonoBehaviour
         _groundElevation = groundElevation;
     }
     
-    public void SetMeshSettings(int gridDensity, int gridNbLayer, int meshSize, float heightMultiplier)
+    public void SetMeshSettings(MeshSettings meshSettings)
     {
-        _gridDensity      = gridDensity;
-        _gridNbLayer      = gridNbLayer;
-        _meshSize         = meshSize;
-        _heightMultiplier = heightMultiplier;
+        _gridDensity      = meshSettings.gridDensity;
+        _meshSize         = meshSettings.meshSize;
+        _heightMultiplier = meshSettings.heightMultiplier;
     }
 
-    public void SetPerlinNoiseSettings(float frequency, int octaveCount, float persistence, float lacunarity, long seed, Vector3 perlinOffset)
+    public void SetPerlinNoiseSettings(PerlinNoiseSettings perlinNoiseSettings)
     {
-        _frequency    = frequency;
-        _octaveCount  = octaveCount;
-        _persistence  = persistence;
-        _lacunarity   = lacunarity;
-        _seed         = seed;
-        _perlinOffset = perlinOffset;
-    }
-
-    public void SetOption(bool islandify, bool shapeIsland, bool makeLayer)
-    {
-        _islandify   = islandify;
-        _shapeIsland = shapeIsland;
-        _makeLayer   = makeLayer;
+        _frequency    = perlinNoiseSettings.frequency;
+        _octaveCount  = perlinNoiseSettings.octaves;
+        _persistence  = perlinNoiseSettings.persistence;
+        _lacunarity   = perlinNoiseSettings.lacunarity;
+        _seed         = perlinNoiseSettings.seed;
+        _perlinOffset = perlinNoiseSettings.offset;
     }
 }
