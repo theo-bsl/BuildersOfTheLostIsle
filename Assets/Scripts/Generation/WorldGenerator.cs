@@ -11,6 +11,8 @@ public class WorldGenerator
     private MeshSettings _meshSettings;
     private PerlinNoiseSettings _perlinNoiseSettings;
     private ResourcesGenerationSettings _resourcesGenerationSettings;
+
+    private Vector3 _worldCenter;
     
     public WorldGenerator(Transform transform, WorldSettings worldSettings, MeshSettings meshSettings, PerlinNoiseSettings perlinNoiseSettings, ResourcesGenerationSettings resourcesGenerationSettings)
     {
@@ -21,6 +23,8 @@ public class WorldGenerator
         _meshSettings = meshSettings;
         _perlinNoiseSettings = perlinNoiseSettings;
         _resourcesGenerationSettings = resourcesGenerationSettings;
+        
+        _worldCenter = new Vector3(worldSettings.worldSize * meshSettings.meshSize / 2f, 0, worldSettings.worldSize * meshSettings.meshSize / 2f);
     }
 
     public void GenerateTerrain()
@@ -32,4 +36,6 @@ public class WorldGenerator
     {
         return _resourcesGenerator.GenerateAllResources(_resourcesGenerationSettings);
     }
+
+    public Vector3 WorldCenter => _worldCenter;
 }
